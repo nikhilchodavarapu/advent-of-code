@@ -7,11 +7,16 @@ const mul = (i, j, k, instructions) =>
 // const getInput = (i, instructions) => instructions[i] = 1;
 const getInput = (i, instructions, input) => instructions[i] = input;
 
-const printOutput = (i, instructions) => instructions[i];
+// const printOutput = (i, instructions) => instructions[i];
 
-export const executeInstructions = (instructions, validInputs, index, prevOutput) => {
-  let isOutputUsed = false;
-  let output = prevOutput;
+export const executeInstructions = (
+  instructions,
+  validInputs,
+  index,
+  prevOutput,
+  isOutputUsed,
+  instructionIndex,
+) => {
   let i = index;
   while (i < instructions.length) {
     // console.log("instruction => ", instructions[i], i);
@@ -39,16 +44,16 @@ export const executeInstructions = (instructions, validInputs, index, prevOutput
         break;
       case 3:
         i1 = mode1 === 0 ? instructions[i + 1] : i + 1;
-        isOutputUsed
+        isOutputUsed[instructionIndex]
           ? getInput(i1, instructions, validInputs[1])
           : getInput(i1, instructions, validInputs[0]);
-        isOutputUsed = !isOutputUsed;
+        isOutputUsed[instructionIndex] = true;
         i += 2;
         break;
       case 4:
         i1 = mode1 === 0 ? instructions[i + 1] : i + 1;
-        output = printOutput(i1, instructions);
-        return [output, i + 2];
+        // output = printOutput(i1, instructions);
+        return [instructions[i1], i + 2];
       case 5:
         i1 = mode1 === 0 ? instructions[i + 1] : i + 1;
         i2 = mode2 === 0 ? instructions[i + 2] : i + 2;
@@ -74,10 +79,10 @@ export const executeInstructions = (instructions, validInputs, index, prevOutput
         i += 4;
         break;
       case 99:
-        return [output, 99];
+        return [prevOutput, 99];
     }
   }
-  return [output];
+  return [prevOutput];
 };
 
 const getHighestSignal = (originalInstructions) => {
@@ -89,19 +94,30 @@ const getHighestSignal = (originalInstructions) => {
     let output = [0];
     const halted = [1, 1, 1, 1, 1];
     const indexes = [0, 0, 0, 0, 0];
-    const prevOutputs = [0, 0, 0, 0, 0]
-    const instructions = Array.from({length : 5}, _ => [...originalInstructions]);
+    const prevOutputs = [0, 0, 0, 0, 0];
+    const isOutputUsed = [false, false, false, false, false];
+    const instructions = Array.from(
+      { length: 5 },
+      (_) => [...originalInstructions],
+    );
     console.log(seq);
     while (halted.includes(1)) {
       if (halted[i] === 1) {
         const validInputs = [seq[i], output[0]];
-        output = executeInstructions(instructions[i], validInputs, indexes[i], prevOutputs[i]);
+        output = executeInstructions(
+          instructions[i],
+          validInputs,
+          indexes[i],
+          prevOutputs[i],
+          isOutputUsed,
+          i,
+        );
+        console.log(output);
         prevOutputs[i] = output[0];
         if (output[1] === 99) {
           halted[i] = 0;
           console.log(output);
-        }
-        else indexes[i] = output[1];
+        } else indexes[i] = output[1];
       }
       i = ++i % 5;
     }
