@@ -1,3 +1,4 @@
+// deno-lint-ignore no-unversioned-import
 import { permutations } from "jsr:@std/collections";
 
 const add = (i, j, k, instructions) =>
