@@ -1,5 +1,3 @@
-import { distinctBy } from "jsr:@std/collections";
-
 const add = (i, j, k, instructions) =>
   instructions[k] = instructions[i] + instructions[j];
 const mul = (i, j, k, instructions) =>
@@ -106,7 +104,6 @@ const compass = {
 };
 
 const paintPanel = (instructions) => {
-  let turnOrpaint = true;
   let currentDirection = "N";
   const paintedLoc = [{ x: 0, y: 10, color: 1 }];
   const positionOfRobot = { x: 0, y: 10 };
@@ -114,7 +111,6 @@ const paintPanel = (instructions) => {
     { length: 50 },
     (_) => Array.from({ length: 50 }, (_) => " "),
   );
-  // let ouput = executeInstructions(instructions, 0, 0);
   const relativeBase = [0]
   let ouput = executeInstructions(instructions, 0, 1, relativeBase);
   while (ouput.length !== 1) {
@@ -125,31 +121,18 @@ const paintPanel = (instructions) => {
     const [i, j] = compass[currentDirection].offset;
     positionOfRobot.x += i;
     positionOfRobot.y += j;
-    // if (turnOrpaint) paintedLoc.push({ ...positionOfRobot, color: ouput[0] });
-    // else {
-    //   currentDirection = compass[currentDirection][ouput[0]];
-    //   const [i, j] = compass[currentDirection].offset;
-    //   positionOfRobot.x += i;
-    //   positionOfRobot.y += j;
-    // }
     const currentPosition = paintedLoc.filter((pos) =>
       pos.x === positionOfRobot.x && pos.y === positionOfRobot.y
     ).at(-1);
     const color = currentPosition ? currentPosition.color : 0;
     ouput = executeInstructions(instructions, ouput[1], color, relativeBase);
-    // console.log(ouput);
-    turnOrpaint = !turnOrpaint;
-    // console.log(ouput)
-    // console.log(positionOfRobot, paintedLoc);
   }
-  // console.log(distinctBy(paintedLoc, pos => pos.x + "" + pos.y).length);
   const result = paintedLoc.reduce(
     (unique, point) => unique[`${point.x},${point.y}`] = true && unique,
     {},
   );
   console.log(Object.keys(result).length);
   console.log(panel.map((x) => x.join("")).join("\n"));
-  // console.log(ouput.length, paintedLoc.length);
 };
 
 const main = () => {
