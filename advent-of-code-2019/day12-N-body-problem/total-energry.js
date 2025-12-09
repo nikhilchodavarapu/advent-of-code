@@ -1,31 +1,3 @@
-// const positions = [
-//   { x: 8, y: -17, z: 0 },
-//   { x: 52, y:5 z: -10 },
-//   { x: 24, y: 78, z:3-8 },
-//   { x: 97, y:-84, z:-34 },
-// ];
-
-// const velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-
-let positions = [
-  { x: 8, y: -10, z: 0 },
-  { x: 5, y: 5, z: 10 },
-  { x: 2, y: -7, z: 3 },
-  { x: 9, y: -8, z: -3 },
-];
-
-let velocity = [
-  { x: 0, y: 0, z: 0 },
-  { x: 0, y: 0, z: 0 },
-  { x: 0, y: 0, z: 0 },
-  { x: 0, y: 0, z: 0 },
-];
-
 const isMoreOrLess = (x, y) => x < y ? +1 : x > y ? -1 : 0;
 
 const incrementVelocity = (position1, position2, velocity) => {
@@ -50,194 +22,79 @@ const modifyPositions = (positions, velocity) => {
   }
 };
 
-const findTotalEnergy = (positions, velocity) => {
-  let potentialEnergy = 0;
-  let kineticEnergy = 0;
-  let totalEnergy = 0;
-  for (let i = 0; i < 4; i++) {
-    potentialEnergy = Math.abs(positions[i].x) + Math.abs(positions[i].y) +
-      Math.abs(positions[i].z);
-    kineticEnergy = Math.abs(velocity[i].x) + Math.abs(velocity[i].y) +
-      Math.abs(velocity[i].z);
-    totalEnergy += potentialEnergy * kineticEnergy;
-  }
-  return totalEnergy;
-};
+// const findTotalEnergy = (positions, velocity) => {
+//   let potentialEnergy = 0;
+//   let kineticEnergy = 0;
+//   let totalEnergy = 0;
+//   for (let i = 0; i < 4; i++) {
+//     potentialEnergy = Math.abs(positions[i].x) + Math.abs(positions[i].y) +
+//       Math.abs(positions[i].z);
+//     kineticEnergy = Math.abs(velocity[i].x) + Math.abs(velocity[i].y) +
+//       Math.abs(velocity[i].z);
+//     totalEnergy += potentialEnergy * kineticEnergy;
+//   }
+//   return totalEnergy;
+// };
 
-const simulate = (positions, velocity, steps) => {
-  for (let i = 0; i < steps; i++) {
-    console.log(i)
-    modifyVelocity(positions, velocity);
-    modifyPositions(positions, velocity);
-  }
-  console.log(findTotalEnergy(positions, velocity));
-  console.log(positions)
-};
+// const simulate = (positions, velocity, steps) => {
+//   for (let i = 0; i < steps; i++) {
+//     // console.log(i);
+//     modifyVelocity(positions, velocity);
+//     modifyPositions(positions, velocity);
+//   }
+//   // console.log(findPotentialEnergy(positions));
+//   console.log(positions);
+// };
 
-const arePositionsEqual = (p1, p2) => {
+const arePositionsEqual = (p1, p2, axis) => {
   let isEqual = true;
   for (let i = 0; i < 4; i++) {
-    isEqual = p1[i].x === p2[i].x && p1[i].y === p2[i].y && p1[i].z === p2[i].z;
+    isEqual = isEqual && p1[i][axis] === p2[i][axis];
   }
   return isEqual;
 };
 
 const countSteps = (positions, velocity) => {
-  let prevPosition = positions.map((x) => ({ ...x }));
-  let steps = 0;
-  modifyVelocity(positions, velocity);
-  modifyPositions(positions, velocity);
-  while (!arePositionsEqual(positions, velocity)) {
-    prevPosition = positions.map((x) => ({ ...x }));
+  let i = 0;
+  const indexes = { x: -1, y: -1, z: -1 };
+  let prevPositions = positions.map((x) => ({ ...x }));
+  while (Object.values(indexes).includes(-1)) {
     modifyVelocity(positions, velocity);
     modifyPositions(positions, velocity);
-    steps++;
+    indexes.x =
+      indexes.x === -1 && arePositionsEqual(prevPositions, positions, "x")
+        ? i + 1
+        : indexes.x;
+    indexes.y =
+      indexes.y === -1 && arePositionsEqual(prevPositions, positions, "y")
+        ? i + 1
+        : indexes.y;
+    indexes.z =
+      indexes.z === -1 && arePositionsEqual(prevPositions, positions, "z")
+        ? i + 1
+        : indexes.z;
+    prevPositions = positions.map((x) => ({ ...x }));
+    i++;
   }
-  console.log(steps)
+  console.log(Object.values(indexes).reduce((product, x) => product * x, 1));
 };
 
-simulate(positions, velocity, 2343387462)
+const positions = [
+  // { x: -8, y: -10, z: 0 },
+  // { x: 5, y: 5, z: 10 },
+  // { x: 2, y: -7, z: 3 },
+  // { x: 9, y: -8, z: -3 },
+  { x: -1, y: 7, z: 3 },
+  { x: 12, y: 2, z: -13 },
+  { x: 14, y: 18, z: -8 },
+  { x: 17, y: 4, z: -4 },
+];
 
-// simulate(positions, velocity, 1382);
-//  positions = [
-//   { x: 8, y: -10, z: 0 },
-//   { x: 5, y: 5, z: 10 },
-//   { x: 2, y: -7, z: 3 },
-//   { x: 9, y: -8, z: -3 },
-// ];
+const velocity = [
+  { x: 0, y: 0, z: 0 },
+  { x: 0, y: 0, z: 0 },
+  { x: 0, y: 0, z: 0 },
+  { x: 0, y: 0, z: 0 },
+];
 
-//  velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-
-// simulate(positions, velocity, 1383);
-//  positions = [
-//   { x: 8, y: -10, z: 0 },
-//   { x: 5, y: 5, z: 10 },
-//   { x: 2, y: -7, z: 3 },
-//   { x: 9, y: -8, z: -3 },
-// ];
-
-//  velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-// simulate(positions, velocity, 1384);
-//  positions = [
-//   { x: 8, y: -10, z: 0 },
-//   { x: 5, y: 5, z: 10 },
-//   { x: 2, y: -7, z: 3 },
-//   { x: 9, y: -8, z: -3 },
-// ];
-
-//  velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-
-// simulate(positions, velocity, 1385);
-//  positions = [
-//   { x: 8, y: -10, z: 0 },
-//   { x: 5, y: 5, z: 10 },
-//   { x: 2, y: -7, z: 3 },
-//   { x: 9, y: -8, z: -3 },
-// ];
-
-//  velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-// simulate(positions, velocity, 1386)
-//  positions = [
-//   { x: 8, y: -10, z: 0 },
-//   { x: 5, y: 5, z: 10 },
-//   { x: 2, y: -7, z: 3 },
-//   { x: 9, y: -8, z: -3 },
-// ];
-
-//  velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-// simulate(positions, velocity, 1387)
-//  positions = [
-//   { x: 8, y: -10, z: 0 },
-//   { x: 5, y: 5, z: 10 },
-//   { x: 2, y: -7, z: 3 },
-//   { x: 9, y: -8, z: -3 },
-// ];
-
-//  velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-// simulate(positions, velocity, 1388)
-//  positions = [
-//   { x: 8, y: -10, z: 0 },
-//   { x: 5, y: 5, z: 10 },
-//   { x: 2, y: -7, z: 3 },
-//   { x: 9, y: -8, z: -3 },
-// ];
-
-//  velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-// simulate(positions, velocity, 1389)
-//  positions = [
-//   { x: 8, y: -10, z: 0 },
-//   { x: 5, y: 5, z: 10 },
-//   { x: 2, y: -7, z: 3 },
-//   { x: 9, y: -8, z: -3 },
-// ];
-
-//  velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-// simulate(positions, velocity, 1390)
-//  positions = [
-//   { x: 8, y: -10, z: 0 },
-//   { x: 5, y: 5, z: 10 },
-//   { x: 2, y: -7, z: 3 },
-//   { x: 9, y: -8, z: -3 },
-// ];
-
-//  velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-// simulate(positions, velocity, 1391)
-//  positions = [
-//   { x: 8, y: -10, z: 0 },
-//   { x: 5, y: 5, z: 10 },
-//   { x: 2, y: -7, z: 3 },
-//   { x: 9, y: -8, z: -3 },
-// ];
-
-//  velocity = [
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-//   { x: 0, y: 0, z: 0 },
-// ];
-// simulate(positions, velocity, 1392)
+countSteps(positions, velocity);

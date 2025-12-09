@@ -4,7 +4,7 @@ const mul = (i, j, k, instructions) =>
   instructions[k] = instructions[i] * instructions[j];
 // const getInput = (i, instructions) => instructions[i] = 1;
 const getInput = (i, instructions) => instructions[i] = 2;
-const printOutput = (i, instructions) => console.log(instructions[i]);
+// const printOutput = (i, instructions) => console.log(instructions[i]);
 
 const getAddress = (mode, instructions, modeNum, relativeBase, i) => {
   switch (mode) {
@@ -17,8 +17,9 @@ const getAddress = (mode, instructions, modeNum, relativeBase, i) => {
   }
 };
 
-export const executeInstructions = (instructions, relativeBase) => {
-  let i = 0;
+export const executeInstructions = (instructions, index, relativeBase) => {
+  let i = index;
+  const outputs = [];
   while (i < instructions.length) {
     const [mode3, mode2, mode1, ...opcodes] = (instructions[i] + "").padStart(
       5,
@@ -49,8 +50,10 @@ export const executeInstructions = (instructions, relativeBase) => {
         break;
       case 4:
         i1 = getAddress(mode1, instructions, 1, relativeBase, i);
-        printOutput(i1, instructions);
+        // printOutput(i1, instructions);
+        outputs.push(instructions[i1]);
         i += 2;
+        if (outputs.length === 3) return [outputs, i];
         break;
       case 5:
         i1 = getAddress(mode1, instructions, 1, relativeBase, i);
@@ -82,17 +85,41 @@ export const executeInstructions = (instructions, relativeBase) => {
         i += 2;
         break;
       case 99:
-        return instructions;
+        return [99];
     }
   }
-  return instructions;
+  return outputs;
+};
+
+const startGame = (instructions) => {
+  const tiles = Array.from(
+    { length: 50 },
+    (_) => Array.from({ length: 50 }, (_) => " "),
+  );
+  const relativeBase = [0];
+  let count = 0;
+  let outputs = executeInstructions(instructions, 0, relativeBase);
+  while (outputs.length !== 1) {
+    const [[x, y, id], index] = outputs;
+    tiles[x][y] = id;
+    if (id === 2) count += 1;
+    outputs = executeInstructions(instructions, index, relativeBase);
+  }
+  // console.log(tiles.map((x) => x.join("")).join("\n"));
+  console.log(
+    tiles.reduce((count, x) =>
+      count + x.reduce((count2, n) =>
+        n === 2 ? count2 + 1 : count2
+      , 0), 0),
+  );
+  console.log(count);
 };
 
 const main = () => {
   const instructions = Deno.readTextFileSync("input.txt").split(",").map((x) =>
     +x
   );
-  executeInstructions(instructions, [0]);
+  startGame(instructions);
 };
 
 main();
