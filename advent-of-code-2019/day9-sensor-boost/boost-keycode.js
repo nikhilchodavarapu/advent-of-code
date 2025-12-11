@@ -3,7 +3,7 @@ const add = (i, j, k, instructions) =>
 const mul = (i, j, k, instructions) =>
   instructions[k] = instructions[i] * instructions[j];
 // const getInput = (i, instructions) => instructions[i] = 1;
-const getInput = (i, instructions) => instructions[i] = 2;
+const getInput = (i, instructions) => instructions[i] = 1;
 const printOutput = (i, instructions) => console.log(instructions[i]);
 
 const getAddress = (mode, instructions, modeNum, relativeBase, i) => {

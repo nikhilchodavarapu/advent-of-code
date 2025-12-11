@@ -3,7 +3,7 @@ const add = (i, j, k, instructions) =>
 const mul = (i, j, k, instructions) =>
   instructions[k] = instructions[i] * instructions[j];
 // const getInput = (i, instructions) => instructions[i] = 1;
-const getInput = (i, instructions) => instructions[i] = 2;
+// const getInput = (i, instructions) => instructions[i] = 2;
 // const printOutput = (i, instructions) => console.log(instructions[i]);
 
 const getAddress = (mode, instructions, modeNum, relativeBase, i) => {
@@ -17,7 +17,12 @@ const getAddress = (mode, instructions, modeNum, relativeBase, i) => {
   }
 };
 
-export const executeInstructions = (instructions, index, relativeBase) => {
+export const executeInstructions = (
+  instructions,
+  index,
+  relativeBase,
+  input,
+) => {
   let i = index;
   const outputs = [];
   while (i < instructions.length) {
@@ -45,7 +50,8 @@ export const executeInstructions = (instructions, index, relativeBase) => {
         break;
       case 3:
         i1 = getAddress(mode1, instructions, 1, relativeBase, i);
-        getInput(i1, instructions);
+        // getInput(i1, instructions, tiles);
+        instructions[i1] = input
         i += 2;
         break;
       case 4:
@@ -97,22 +103,27 @@ const startGame = (instructions) => {
     (_) => Array.from({ length: 50 }, (_) => " "),
   );
   const relativeBase = [0];
-  let count = 0;
-  let outputs = executeInstructions(instructions, 0, relativeBase);
+  let outputs = executeInstructions(instructions, 0, relativeBase, tiles);
+  let ball = 0;
+  let paddle = 0;
+  let score = 0;
   while (outputs.length !== 1) {
     const [[x, y, id], index] = outputs;
-    tiles[x][y] = id;
-    if (id === 2) count += 1;
-    outputs = executeInstructions(instructions, index, relativeBase);
+    tiles[y][x] = id;
+    if (id === 4) ball = x
+    if (id === 3) paddle = x
+    if (x === -1 && y === 0) score = id;
+    outputs = executeInstructions(instructions, index, relativeBase, Math.sign(ball - paddle));
   }
+  console.log(score);
   // console.log(tiles.map((x) => x.join("")).join("\n"));
-  console.log(
-    tiles.reduce((count, x) =>
-      count + x.reduce((count2, n) =>
-        n === 2 ? count2 + 1 : count2
-      , 0), 0),
-  );
-  console.log(count);
+  // console.log(
+  //   tiles.reduce((count, x) =>
+  //     count + x.reduce((count2, n) =>
+  //       n === 2 ? count2 + 1 : count2
+  //     , 0), 0),
+  // );
+  // console.log(count);
 };
 
 const main = () => {
