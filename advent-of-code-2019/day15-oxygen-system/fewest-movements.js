@@ -1,10 +1,41 @@
+const movements = {
+  1: [0, -1],
+  2: [0, 1],
+  3: [1, 0],
+  4: [-1, 0],
+};
+
 const add = (i, j, k, instructions) =>
   instructions[k] = instructions[i] + instructions[j];
 const mul = (i, j, k, instructions) =>
   instructions[k] = instructions[i] * instructions[j];
 // const getInput = (i, instructions) => instructions[i] = 1;
-const getInput = (i, instructions) =>
-  instructions[i] = parseInt(prompt("Enter Movement Command : "));
+const getInput = (i, instructions, area, droidPosition) => {
+  for (let j = 0; j < 10000000; j++);
+  console.clear();
+  for (let x = 1; x <= 4; x++) {
+    const [xi, yi] = movements[x];
+    if (
+      area[droidPosition.y + yi][droidPosition.x + xi] !== "#" &&
+      area[droidPosition.y + yi][droidPosition.x + xi] !== "."
+    ) return instructions[i] = x;
+  }
+
+  for (let x = 1; x <= 4; x++) {
+    const [xi, yi] = movements[x];
+    if (
+      area[droidPosition.y + yi][droidPosition.x + xi] !== "#"
+    ) {
+      area[droidPosition.y][droidPosition.x] = "#";
+      return instructions[i] = x;
+    }
+  }
+  // let x = parseInt(prompt("Enter Movement Command : "));
+  // while (![1, 2, 3, 4].includes(x)) {
+  //   console.log("Invalid Input! Retry")
+  //   x = parseInt(prompt("Enter Movement Command : "));
+  // }
+};
 const printOutput = (i, instructions) => console.log(instructions[i]);
 
 const getAddress = (mode, instructions, modeNum, relativeBase, i) => {
@@ -18,7 +49,12 @@ const getAddress = (mode, instructions, modeNum, relativeBase, i) => {
   }
 };
 
-export const executeInstructions = (instructions, relativeBase, index) => {
+export const executeInstructions = (
+  instructions,
+  relativeBase,
+  index,
+  [area, droidPosition],
+) => {
   let i = index;
   let input = 0;
   while (i < instructions.length) {
@@ -46,7 +82,7 @@ export const executeInstructions = (instructions, relativeBase, index) => {
         break;
       case 3:
         i1 = getAddress(mode1, instructions, 1, relativeBase, i);
-        input = getInput(i1, instructions);
+        input = getInput(i1, instructions, area, droidPosition);
         i += 2;
         break;
       case 4:
@@ -91,29 +127,100 @@ export const executeInstructions = (instructions, relativeBase, index) => {
   return instructions;
 };
 
-// const findLeastPath = () => {
+const findShortestPath = (startPosition, droidPosition, area) => {
+  let steps = 1;
+  let minutes = 1;
+  while (
+    !(droidPosition.x === startPosition.x &&
+      droidPosition.y === startPosition.y)
+  ) {
+    // for (let j = 0; j < 100000000; j++);
+    // console.clear();
+    for (let x = 1; x <= 4; x++) {
+      const [xi, yi] = movements[x];
+      if (
+        area[droidPosition.y + yi][droidPosition.x + xi] === "."
+      ) {
+        minutes += yi !== 0 ? 1 : 0;
+        area[droidPosition.y][droidPosition.x] = "#";
+        droidPosition.y += yi;
+        droidPosition.x += xi;
+        area[droidPosition.y][droidPosition.x] = "D";
+        steps++;
+        break;
+      }
+    }
+    console.log(area.map((x) => x.join("")).join("\n"));
+  }
+  return [steps, minutes];
+};
 
-// }
+const findMaxMinutes = (startPosition, droidPosition, area) => {
+  let steps = 1;
+  let minutes = 1;
+  while (
+    !(droidPosition.x === startPosition.x &&
+      droidPosition.y === startPosition.y)
+  ) {
+    // for (let j = 0; j < 100000000; j++);
+    // console.clear();
+    for (let x = 1; x <= 4; x++) {
+      const [xi, yi] = movements[x];
+      if (
+        area[droidPosition.y + yi][droidPosition.x + xi] === "."
+      ) {
+        minutes += yi !== 0 ? 1 : 0;
+        area[droidPosition.y][droidPosition.x] = "O";
+        droidPosition.y += yi;
+        droidPosition.x += xi;
+        area[droidPosition.y][droidPosition.x] = "O";
+        steps++;
+        break;
+      }
+    }
+    console.log(area.map((x) => x.join("")).join("\n"));
+  }
+  return [steps, minutes];
+};
 
 const findPath = (instructions) => {
   const area = Array.from(
-    { length: 40 },
-    (_) => Array.from({ length: 40 }, (_) => " "),
+    { length: 100 },
+    (_) => Array.from({ length: 100 }, (_) => " "),
   );
-  const relativeBase = [0]
-  let reply = executeInstructions(instructions, relativeBase, 0);
-  const droidPosition = {x : 0, y : 0};
-  area[0][0] = 'D';
+  const relativeBase = [0];
+  const startPosition = { x: 50, y: 50 };
+  const droidPosition = { x: 50, y: 50 };
+  let reply = executeInstructions(instructions, relativeBase, 0, [
+    area,
+    droidPosition,
+  ]);
+  area[droidPosition.y][droidPosition.x] = "D";
   while (reply[0] !== 2) {
-    if (reply[0] === 0) {
-      area[droidPosition.y + 1][droidPosition.x] = '#';
-    } else {
-      area[droidPosition.y][droidPosition.x] = '.';
-      area[droidPosition.y + 1][droidPosition.x] = 'D';
+    console.log(reply[1]);
+    if (reply[1] === undefined) {
+      console.log(area.map((x) => x.join("")).join("\n"));
     }
-    console.log(area.map(x => x.join("")).join("\n"))
-    reply = executeInstructions(instructions, relativeBase, reply[2])
+    const [xi, yi] = movements[reply[1]];
+    if (reply[0] === 0) {
+      area[droidPosition.y + yi][droidPosition.x + xi] = "#";
+    } else {
+      area[droidPosition.y][droidPosition.x] =
+        area[droidPosition.y][droidPosition.x] !== "#" ? "." : "#";
+      area[droidPosition.y + yi][droidPosition.x + xi] = "D";
+      droidPosition.x += xi;
+      droidPosition.y += yi;
+    }
+
+    console.log(area.map((x) => x.join("")).join("\n"));
+    reply = executeInstructions(instructions, relativeBase, reply[2], [
+      area,
+      droidPosition,
+    ]);
+    console.log(area.map((x) => x.join("")).join("\n"));
   }
+  // console.log(findShortestPath(startPosition, droidPosition, area));
+  // console.log(findMaxMinutes(startPosition, droidPosition, area));
 };
 
 const main = () => {
