@@ -110,7 +110,8 @@ const locateScaffoldIntersections = (cameraOutput) => {
     for (let j = 0; j < cameraOutput[i].length; j++) {
       if (cameraOutput[i][j] === "#") {
         if (
-          cameraOutput[i + 1][j] === "#" && cameraOutput[i - 1] !== undefined && cameraOutput[i - 1][j] === "#" &&
+          cameraOutput[i + 1][j] === "#" && cameraOutput[i - 1] !== undefined &&
+          cameraOutput[i - 1][j] === "#" &&
           cameraOutput[i][j + 1] === "#" && cameraOutput[i][j - 1] === "#"
         ) {
           cameraOutput[i][j] = "O";
@@ -127,16 +128,16 @@ const main = () => {
   const instructions = Deno.readTextFileSync("input.txt").split(",").map((x) =>
     +x
   );
-  const input = `..#..........
-..#..........
-#######...###
-#.#...#...#.#
-#############
-..#...#...#..
-..#####...^..
-`;
-  // const cameraOutput = getCameraOutput(instructions, [0]);
-  const cameraOutput = input.split("\n").map(x => x.split(""));
+  //   const input = `..#..........
+  // ..#..........
+  // #######...###
+  // #.#...#...#.#
+  // #############
+  // ..#...#...#..
+  // ..#####...^..
+  // `;
+  // const cameraOutput = input.split("\n").map(x => x.split(""));
+  const cameraOutput = getCameraOutput(instructions, [0]);
   locateScaffoldIntersections(cameraOutput);
   console.log(cameraOutput.map((x) => x.join("")).join("\n"));
 };
