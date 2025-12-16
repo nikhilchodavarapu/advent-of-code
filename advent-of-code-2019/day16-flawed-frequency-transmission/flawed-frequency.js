@@ -30,22 +30,20 @@ const getFinalOutput = (signal, phases) => {
 };
 
 const runAPhaseBackward = (signal) => {
-  const nextPhase = [signal[signal.length - 1]];
   for (let i = signal.length - 2; i >= 0; i--) {
-    nextPhase.unshift((signal[i] + nextPhase[0]) % 10);
+    signal[i] = (signal[i] + signal[i+1]) % 10;
   }
-  return nextPhase;
 };
 
 const getFinalMessage = (signal, phases) => {
   const repeatedSignal = signal.repeat(10000);
   const offset = +signal.slice(0, 7);
   const limit = repeatedSignal.length - offset;
-  console.log(limit)
-  let currentPhase = repeatedSignal.slice(-limit).split("").map(x => +x);
+  console.log(limit);
+  const currentPhase = repeatedSignal.slice(-limit).split("").map((x) => +x);
   for (let i = 0; i < phases; i++) {
-    console.log("Phase Number => ", i)
-    currentPhase = runAPhaseBackward(currentPhase);
+    console.log("Phase Number => ", i);
+    runAPhaseBackward(currentPhase);
   }
   return currentPhase.slice(0, 8).join("");
 };
