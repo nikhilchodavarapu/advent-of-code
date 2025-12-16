@@ -17,16 +17,18 @@ const getInput = (i, instructions, area, droidPosition) => {
     const [xi, yi] = movements[x];
     if (
       area[droidPosition.y + yi][droidPosition.x + xi] !== "#" &&
-      area[droidPosition.y + yi][droidPosition.x + xi] !== "."
+      area[droidPosition.y + yi][droidPosition.x + xi] !== "." &&
+      area[droidPosition.y + yi][droidPosition.x + xi] !== "-"
     ) return instructions[i] = x;
   }
 
   for (let x = 1; x <= 4; x++) {
     const [xi, yi] = movements[x];
     if (
-      area[droidPosition.y + yi][droidPosition.x + xi] !== "#"
+      area[droidPosition.y + yi][droidPosition.x + xi] !== "#" &&
+      area[droidPosition.y + yi][droidPosition.x + xi] !== "-"
     ) {
-      area[droidPosition.y][droidPosition.x] = "#";
+      area[droidPosition.y][droidPosition.x] = "-";
       return instructions[i] = x;
     }
   }
@@ -155,32 +157,34 @@ const findShortestPath = (startPosition, droidPosition, area) => {
   return [steps, minutes];
 };
 
-const findMaxMinutes = (startPosition, droidPosition, area) => {
-  let steps = 1;
+const findMaxMinutes = (oxygenSystem, area) => {
   let minutes = 1;
-  while (
-    !(droidPosition.x === startPosition.x &&
-      droidPosition.y === startPosition.y)
-  ) {
-    // for (let j = 0; j < 100000000; j++);
-    // console.clear();
-    for (let x = 1; x <= 4; x++) {
-      const [xi, yi] = movements[x];
-      if (
-        area[droidPosition.y + yi][droidPosition.x + xi] === "."
-      ) {
-        minutes += yi !== 0 ? 1 : 0;
-        area[droidPosition.y][droidPosition.x] = "O";
-        droidPosition.y += yi;
-        droidPosition.x += xi;
-        area[droidPosition.y][droidPosition.x] = "O";
-        steps++;
-        break;
+  const oxygenSystems = [{ ...oxygenSystem }];
+  let count = 1;
+  while (count !== 0) {
+    count = 0;
+    for (let j = 0; j < 100000000; j++);
+    console.clear();
+    console.log(area.map((x) => x.join("")).join("\n"));
+    // console.log(oxygenSystems);
+    const osLength = oxygenSystems.length;
+    for (let i = 0; i < osLength; i++) {
+      const pos = oxygenSystems[i];
+      for (let x = 1; x <= 4; x++) {
+        const [xi, yi] = movements[x];
+        if (
+          area[pos.y + yi][pos.x + xi] === "." ||
+          area[pos.y + yi][pos.x + xi] === "-"
+        ) {
+          count++;
+          area[pos.y + yi][pos.x + xi] = "O";
+          oxygenSystems.push({ x: pos.x + xi, y: pos.y + yi });
+        }
       }
     }
-    console.log(area.map((x) => x.join("")).join("\n"));
+    if (count !== 0) minutes++;
   }
-  return [steps, minutes];
+  return minutes;
 };
 
 const findPath = (instructions) => {
@@ -206,7 +210,7 @@ const findPath = (instructions) => {
       area[droidPosition.y + yi][droidPosition.x + xi] = "#";
     } else {
       area[droidPosition.y][droidPosition.x] =
-        area[droidPosition.y][droidPosition.x] !== "#" ? "." : "#";
+        area[droidPosition.y][droidPosition.x] !== "-" ? "." : "-";
       area[droidPosition.y + yi][droidPosition.x + xi] = "D";
       droidPosition.x += xi;
       droidPosition.y += yi;
@@ -220,7 +224,7 @@ const findPath = (instructions) => {
     console.log(area.map((x) => x.join("")).join("\n"));
   }
   // console.log(findShortestPath(startPosition, droidPosition, area));
-  // console.log(findMaxMinutes(startPosition, droidPosition, area));
+  console.log(findMaxMinutes(droidPosition, area));
 };
 
 const main = () => {
