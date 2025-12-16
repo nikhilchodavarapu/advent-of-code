@@ -21,7 +21,7 @@ const runAPhase = (signal) => {
   return nextPhase;
 };
 
-const getFinalOutput = (signal, phases) => {
+const _getFinalOutput = (signal, phases) => {
   let currentPhase = signal;
   for (let i = 0; i < phases; i++) {
     currentPhase = runAPhase(currentPhase);
