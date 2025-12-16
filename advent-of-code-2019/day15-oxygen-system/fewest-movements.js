@@ -129,7 +129,7 @@ export const executeInstructions = (
   return instructions;
 };
 
-const findShortestPath = (startPosition, droidPosition, area) => {
+const _findShortestPath = (startPosition, droidPosition, area) => {
   let steps = 1;
   let minutes = 1;
   while (
@@ -193,7 +193,7 @@ const findPath = (instructions) => {
     (_) => Array.from({ length: 100 }, (_) => " "),
   );
   const relativeBase = [0];
-  const startPosition = { x: 50, y: 50 };
+  // const startPosition = { x: 50, y: 50 };
   const droidPosition = { x: 50, y: 50 };
   let reply = executeInstructions(instructions, relativeBase, 0, [
     area,
