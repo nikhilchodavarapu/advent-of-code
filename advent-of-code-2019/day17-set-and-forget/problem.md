@@ -112,3 +112,4 @@ As the vacuum robot finds other robots and notifies them of the impending solar 
 
 After visiting every part of the scaffold at least once, how much dust does the vacuum robot report it has collected?
 
+path = "R,8,R,10,R,10,R,4,R,8,R,10,R,12,R,8,R,10,R,10,R,12,R,4,L,12,L,12,R,8,R,10,R,10,R,4,R,8,R,10,R,12,R,12,R,4,L,12,L,12,R,8,R,10,R,10,R,4,R,8,R,10,R,12,R,12,R,4,L,12,L,12"

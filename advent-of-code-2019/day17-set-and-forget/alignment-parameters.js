@@ -3,8 +3,77 @@ const add = (i, j, k, instructions) =>
 const mul = (i, j, k, instructions) =>
   instructions[k] = instructions[i] * instructions[j];
 // const getInput = (i, instructions) => instructions[i] = 1;
-const getInput = (i, instructions) => instructions[i] = 1;
-const printOutput = (i, instructions) => console.log(instructions[i]);
+const getInput = (i, instructions, currentInput) => {
+  const main = [
+    65,
+    44,
+    66,
+    44,
+    65,
+    44,
+    67,
+    44,
+    65,
+    44,
+    66,
+    44,
+    67,
+    44,
+    65,
+    44,
+    66,
+    44,
+    67,
+    10,
+  ];
+  const A = [82, 44, 56, 44, 82, 44, 49, 48, 44, 82, 44, 49, 48, 10];
+  const B = [
+    82,
+    44,
+    52,
+    44,
+    82,
+    44,
+    56,
+    44,
+    82,
+    44,
+    49,
+    48,
+    44,
+    82,
+    44,
+    49,
+    50,
+    10,
+  ];
+  const C = [
+    82,
+    44,
+    49,
+    50,
+    44,
+    82,
+    44,
+    52,
+    44,
+    76,
+    44,
+    49,
+    50,
+    44,
+    76,
+    44,
+    49,
+    50,
+    10,
+  ];
+  const V = [121, 10];
+  console.log(currentInput)
+  instructions[i] =
+    main.concat(A).concat(B).concat(C).concat(V)[currentInput[0]++];
+};
+const _printOutput = (i, instructions) => console.log(instructions[i]);
 
 const getAddress = (mode, instructions, modeNum, relativeBase, i) => {
   switch (mode) {
@@ -19,8 +88,9 @@ const getAddress = (mode, instructions, modeNum, relativeBase, i) => {
 
 export const getCameraOutput = (instructions, relativeBase) => {
   let i = 0;
+  const currentInput = [0];
   const cameraOutput = [];
-  let line = [];
+  // let line = [];
   while (i < instructions.length) {
     const [mode3, mode2, mode1, ...opcodes] = (instructions[i] + "").padStart(
       5,
@@ -46,13 +116,14 @@ export const getCameraOutput = (instructions, relativeBase) => {
         break;
       case 3:
         i1 = getAddress(mode1, instructions, 1, relativeBase, i);
-        getInput(i1, instructions);
+        getInput(i1, instructions, currentInput);
         i += 2;
         break;
       case 4:
         i1 = getAddress(mode1, instructions, 1, relativeBase, i);
         // printOutput(i1, instructions);
-        cameraOutput.push(String.fromCharCode(instructions[i1]));
+        // cameraOutput.push(String.fromCharCode(instructions[i1]));
+        [35, 46, 10].includes(instructions[i1]) ? "" : console.log(instructions[i1])
         i += 2;
         break;
       case 5:
@@ -91,7 +162,7 @@ export const getCameraOutput = (instructions, relativeBase) => {
   return instructions;
 };
 
-const locateScaffoldIntersections = (cameraOutput) => {
+const _locateScaffoldIntersections = (cameraOutput) => {
   const intersectionPoints = [];
   let sum = 0;
   for (let i = 0; i < cameraOutput.length; i++) {
@@ -113,7 +184,7 @@ const locateScaffoldIntersections = (cameraOutput) => {
   return cameraOutput;
 };
 
-const getRobotPos = (cameraOutput) => {
+const _getRobotPos = (cameraOutput) => {
   for (let i = 0; i < cameraOutput.length; i++) {
     const index = cameraOutput[i].findIndex((x) => x === "^");
     if (index !== -1) return ({ x: index, y: i, direction: "N", robo: "^" });
@@ -145,7 +216,7 @@ const turn = (pos, direc) => {
   };
 };
 
-const getPath = (robotPos, cameraOutput) => {
+const _getPath = (robotPos, cameraOutput) => {
   const currentPos = { ...robotPos };
   const path = [];
   let isEnd = false;
@@ -200,14 +271,14 @@ const main = () => {
   // `;
   // const cameraOutput = input.split("\n").map(x => x.split(""));
   const cameraOutput = getCameraOutput(instructions, [0]);
+  console.log(cameraOutput.map((x) => x.join("")).join("\n"))
   // const intersected = locateScaffoldIntersections([...cameraOutput]);
   // console.log(intersected.map((x) => x.join("")).join("\n"));
 
-  const robotPos = getRobotPos(cameraOutput);
-  const path = getPath(robotPos, cameraOutput);
-  console.log(path)
+  // const robotPos = getRobotPos(cameraOutput);
+  // const path = getPath(robotPos, cameraOutput);
+  // console.log(path);
 };
-
 
 //1,R,9,R,11,R,11,R,5,R,9,R,11,R,13,R,9,R,11,R,11,R,13,R,5,L,13,L,13,R,9,R,11,R,11,R,5,R,9,R,11,R,13,R,13,R,5,L,13,L,13,R,9,R,11,R,11,R,5,R,9,R,11,R,13,R,13,R,5,L,13,L,13
 main();
