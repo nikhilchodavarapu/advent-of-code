@@ -52,18 +52,7 @@ export const getCameraOutput = (instructions, relativeBase) => {
       case 4:
         i1 = getAddress(mode1, instructions, 1, relativeBase, i);
         // printOutput(i1, instructions);
-        switch (instructions[i1]) {
-          case 35:
-            line.push("#");
-            break;
-          case 46:
-            line.push(".");
-            break;
-          case 10:
-            cameraOutput.push(line);
-            line = [];
-            break;
-        }
+        cameraOutput.push(String.fromCharCode(instructions[i1]));
         i += 2;
         break;
       case 5:
@@ -96,8 +85,7 @@ export const getCameraOutput = (instructions, relativeBase) => {
         i += 2;
         break;
       case 99:
-        cameraOutput.push(line);
-        return cameraOutput;
+        return cameraOutput.join("").split("\n").map((x) => x.split(""));
     }
   }
   return instructions;
@@ -122,6 +110,80 @@ const locateScaffoldIntersections = (cameraOutput) => {
     }
   }
   console.log(sum);
+  return cameraOutput;
+};
+
+const getRobotPos = (cameraOutput) => {
+  for (let i = 0; i < cameraOutput.length; i++) {
+    const index = cameraOutput[i].findIndex((x) => x === "^");
+    if (index !== -1) return ({ x: index, y: i, direction: "N", robo: "^" });
+  }
+};
+
+const compass = {
+  N: { R: "W", L: "E", M: [0, -1], robo: "^" },
+  W: { R: "S", L: "N", M: [1, 0], robo: ">" },
+  S: { R: "E", L: "W", M: [0, 1], robo: "v" },
+  E: { R: "N", L: "S", M: [-1, 0], robo: "<" },
+};
+
+const moveForward = (pos) => {
+  const nextPosDetails = compass[pos.direction];
+  return {
+    ...pos,
+    x: pos.x + nextPosDetails.M[0],
+    y: pos.y + nextPosDetails.M[1],
+  };
+};
+
+const turn = (pos, direc) => {
+  const nextPosDetails = compass[pos.direction];
+  return {
+    ...pos,
+    direction: nextPosDetails[direc],
+    robo: nextPosDetails.robo,
+  };
+};
+
+const getPath = (robotPos, cameraOutput) => {
+  const currentPos = { ...robotPos };
+  const path = [];
+  let isEnd = false;
+  // console.log(moveForward(currentPos));
+  while (!isEnd) {
+    let moves = 0;
+    let nextPosition = moveForward(currentPos);
+    let x = nextPosition.x;
+    let y = nextPosition.y;
+    while (cameraOutput[y] !== undefined && cameraOutput[y][x] === "#") {
+      cameraOutput[y][x] = currentPos.robo;
+      cameraOutput[currentPos.y][currentPos.x] = "#";
+      currentPos.x = x;
+      currentPos.y = y;
+      nextPosition = moveForward(currentPos);
+      x = nextPosition.x;
+      y = nextPosition.y;
+      moves++;
+    }
+    if (moves !== 0) path.push(moves);
+    nextPosition = moveForward(turn(currentPos, "R"));
+    x = nextPosition.x;
+    y = nextPosition.y;
+    if (cameraOutput[y] === undefined || cameraOutput[y][x] !== "#") {
+      nextPosition = moveForward(turn(currentPos, "L"));
+      x = nextPosition.x;
+      y = nextPosition.y;
+      if (cameraOutput[y] === undefined || cameraOutput[y][x] !== "#") {
+        isEnd = true;
+      } else path.push("L");
+    } else path.push("R");
+    currentPos.direction = nextPosition.direction;
+    console.log(cameraOutput.map((x) => x.join("")).join("\n"));
+    for (let i = 0; i < 1000000000; i++);
+    console.clear();
+    // console.log("hello")
+  }
+  return path.join(",");
 };
 
 const main = () => {
@@ -138,8 +200,14 @@ const main = () => {
   // `;
   // const cameraOutput = input.split("\n").map(x => x.split(""));
   const cameraOutput = getCameraOutput(instructions, [0]);
-  locateScaffoldIntersections(cameraOutput);
-  console.log(cameraOutput.map((x) => x.join("")).join("\n"));
+  // const intersected = locateScaffoldIntersections([...cameraOutput]);
+  // console.log(intersected.map((x) => x.join("")).join("\n"));
+
+  const robotPos = getRobotPos(cameraOutput);
+  const path = getPath(robotPos, cameraOutput);
+  console.log(path)
 };
 
+
+//1,R,9,R,11,R,11,R,5,R,9,R,11,R,13,R,9,R,11,R,11,R,13,R,5,L,13,L,13,R,9,R,11,R,11,R,5,R,9,R,11,R,13,R,13,R,5,L,13,L,13,R,9,R,11,R,11,R,5,R,9,R,11,R,13,R,13,R,5,L,13,L,13
 main();
