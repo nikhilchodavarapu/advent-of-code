@@ -125,8 +125,8 @@ const solveMaze = (maze) => {
           let leftForward = moveForward(turn(pos, "L"));
           let rightForward = moveForward(turn(pos, "R"));
           while (
-            maze[leftForward.y][leftForward.x] !== "#" &&
-            maze[rightForward.y][rightForward.x] !== "#"
+            maze[leftForward.y][leftForward.x] === "#" &&
+            maze[rightForward.y][rightForward.x] === "#"
           ) {
             nextPosition = moveForward(pos);
             x = nextPosition.x;
@@ -135,7 +135,6 @@ const solveMaze = (maze) => {
             pos.x = x;
             pos.y = y;
             maze[pos.y][pos.x] = "*";
-            pos.direction = nextPosition.direction;
             leftForward = moveForward(turn(pos, "L"));
             rightForward = moveForward(turn(pos, "R"));
           }
@@ -149,6 +148,7 @@ const solveMaze = (maze) => {
           pos.x = x;
           pos.y = y;
           maze[pos.y][pos.x] = "*";
+          pos.direction = nextPosition.direction;
         } else pos.direction = nextPosition.direction;
       } else pos.direction = nextPosition.direction;
 
