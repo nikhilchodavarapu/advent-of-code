@@ -8,9 +8,11 @@ const entrance = (map) => {
   }, {});
   return position;
 }
+
 const collectKeys = () => {
   const map = `#########\n#b.A.@.a#\n#########`.split("\n").map((x) =>
     x.split("")
   );
   const startingPos = entrance(map);
+  move()
 };
