@@ -5,7 +5,7 @@ const dealStack = (cards, increment = 0) => {
   for (let i = 0; i < cards.length; i++) {
     newStack[j] = cards[i];
     j += reqIncr;
-    j = j % cards.length;
+    j = j % cards.length || 1;
   }
   if (!increment) {
     newStack.push(newStack.shift());
@@ -14,14 +14,19 @@ const dealStack = (cards, increment = 0) => {
 };
 
 const dealStackIndex = (length, index, increment) => {
-  if (index === 1 && increment) return index;
+  if (index === 0 && increment) return index;
   if (!increment) return length - index - 1;
-  return (index * increment) % length;
+  const limit = Math.floor(increment / 2);
+  let i = index;
+  for (let x = 0; x < limit; x++) {
+    i = (i * increment) % length;
+  }
+  return increment % 2 === 0 ? i : length - i;
 };
 
 const cutStackIndex = (length, index, noOfCards) => {
-  if (noOfCards > 0) return (length - noOfCards + index) % length;
-  else return (index - noOfCards) % length;
+  if (noOfCards > 0) return (noOfCards + index) % length;
+  else return (length + noOfCards + index) % length;
 };
 
 const cut = (cards, noOfCards) => {
@@ -50,21 +55,21 @@ const shuffleCards = () => {
   // for (let i = 0; i < 10007; i++) {
   //   cards[i] = i;
   // }
-  const shuffleProcess = parseInput();
+  const shuffleProcess = parseInput().reverse();
   // let shuffledStack = [...cards];
   // shuffleProcess.forEach((process) => {
   //   shuffledStack = process[0](shuffledStack, process[1]);\
   // });
   // console.log(shuffledStack.indexOf(2019));
   // return shuffledStack.indexOf(2019);
-
-  let index = 2020;
-  const length = 101741582076661;
+  // 101741582076661
+  const length = 10007;
+  let position = 6850;
   shuffleProcess.forEach((process) => {
-    index = process[0](length, index, process[1]);
+    position = process[0](length, position, process[1]);
+    console.log(position)
   });
-  console.log(index);
-  return index;
+  console.log(position);
 };
 
 shuffleCards();
