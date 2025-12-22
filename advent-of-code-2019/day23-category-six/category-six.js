@@ -17,8 +17,15 @@ const getAddress = (mode, instructions, modeNum, relativeBase, i) => {
   }
 };
 
-export const executeInstructions = (instructions, relativeBase) => {
+export const executeInstructions = (
+  instructions,
+  relativeBase,
+  inputs,
+  currentComputer,
+) => {
   let i = 0;
+  let currentInput = -100;
+  const outputs = [];
   while (i < instructions.length) {
     const [mode3, mode2, mode1, ...opcodes] = (instructions[i] + "").padStart(
       5,
@@ -44,12 +51,19 @@ export const executeInstructions = (instructions, relativeBase) => {
         break;
       case 3:
         i1 = getAddress(mode1, instructions, 1, relativeBase, i);
-        getInput(i1, instructions);
+        // getInput(i1, instructions);
+        // console.log(input);
+        currentInput = inputs[currentComputer].shift();
+        instructions[i1] = currentInput === undefined ? -1 : currentInput;
+        // if (instructions[i1] !== -1) console.log(instructions[i1]);
         i += 2;
         break;
       case 4:
         i1 = getAddress(mode1, instructions, 1, relativeBase, i);
         printOutput(i1, instructions);
+        inputs[currentComputer].push(instructions[i1]);
+        outputs.push(instructions[i1]);
+        if (outputs.length === 3) return outputs;
         i += 2;
         break;
       case 5:
@@ -82,7 +96,7 @@ export const executeInstructions = (instructions, relativeBase) => {
         i += 2;
         break;
       case 99:
-        return instructions;
+        return 99;
     }
   }
   return instructions;
@@ -92,7 +106,17 @@ const main = () => {
   const instructions = Deno.readTextFileSync("input.txt").split(",").map((x) =>
     +x
   );
-  executeInstructions(instructions, [0]);
+  const isHalted = Array.from({ length: 50 }, (_) => 99);
+  let i = 0;
+  const inputs = Array.from({ length: 50 }, (_) => [i++]);
+  console.log(inputs);
+  i = 0;
+  while (isHalted.includes(99)) {
+    console.log(i);
+    isHalted[i] = executeInstructions([...instructions], [0], inputs, i);
+    console.log(i);
+    i = ++i % 50;
+  }
 };
 
 main();

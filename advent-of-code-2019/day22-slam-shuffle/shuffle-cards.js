@@ -1,4 +1,4 @@
-const dealStack = (cards, increment = 0) => {
+const _dealStack = (cards, increment = 0) => {
   const newStack = [];
   let j = 0;
   const reqIncr = increment || cards.length - 1;
@@ -29,7 +29,7 @@ const cutStackIndex = (length, index, noOfCards) => {
   else return (length + noOfCards + index) % length;
 };
 
-const cut = (cards, noOfCards) => {
+const _cut = (cards, noOfCards) => {
   if (noOfCards > 0) {
     const cutStack = cards.slice(0, noOfCards);
     return cards.slice(noOfCards).concat(cutStack);
