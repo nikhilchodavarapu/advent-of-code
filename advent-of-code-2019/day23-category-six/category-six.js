@@ -3,7 +3,7 @@ const add = (i, j, k, instructions) =>
 const mul = (i, j, k, instructions) =>
   instructions[k] = instructions[i] * instructions[j];
 // const getInput = (i, instructions) => instructions[i] = 1;
-const getInput = (i, instructions) => instructions[i] = 1;
+const _getInput = (i, instructions) => instructions[i] = 1;
 const printOutput = (i, instructions) => console.log(instructions[i]);
 
 const getAddress = (mode, instructions, modeNum, relativeBase, indexes, i) => {
@@ -251,52 +251,62 @@ export const executeInstructions = (
 };
 
 const main = () => {
-  const instructions = Deno.readTextFileSync("input.txt").split(",").map((x) =>
-    +x
-  );
-  const isHalted = Array.from({ length: 50 }, (_) => 100);
-  let i = 0;
-  const inputs = Array.from({ length: 50 }, (_) => [i++]);
-  const outputs = Array.from({ length: 50 }, (_) => 0);
-  const indexes = Array.from({ length: 50 }, (_) => 0);
-  const relativeBases = Array.from({ length: 50 }, (_) => 0);
-  const instructionsList = Array.from({ length: 50 }, (_) => [...instructions]);
-  const NAT = {};
-  let lastY = -100;
-  console.log(inputs);
-  i = 0;
-  while (!isHalted.includes(99)) {
-    // console.log(i);
-    if (
-      i === 0 && outputs.every(x => x === -1)
-    ) {
-      console.log(NAT.y);
-      if (lastY === NAT.y) break;
-      inputs[0].push(NAT.x, NAT.y);
-    } 
-    const output = executeInstructions(
-      instructionsList,
-      relativeBases,
-      inputs,
-      indexes,
-      i,
-    );
-    outputs[i] = output;
-    // if (output !== 100) console.log(output, i);
-    if (typeof output === "object") {
-      outputs[i] = output[0];
-      if (output[0] === 255) {
-        lastY = NAT.y;
-        NAT.x = output[1];
-        NAT.y = output[2];
-        console.log(output)
-      } else {
-        inputs[output[0]].push(output[1], output[2]);
+  const program = Deno.readTextFileSync("input.txt").split(",").map((x) => +x);
+  const N = 50;
+
+  // state
+  const inputs = Array.from({ length: N }, () => []);
+  const indexes = Array(N).fill(0);
+  const relativeBases = Array(N).fill(0);
+  const programs = Array.from({ length: N }, () => [...program]);
+
+  // give each computer its address
+  for (let i = 0; i < N; i++) {
+    inputs[i].push(i);
+  }
+
+  const NAT = { x: null, y: null };
+  let lastSentY = null;
+
+  while (true) {
+    let anyPacketActivity = false;
+    let anyQueueNonEmpty = false;
+
+    for (let i = 0; i < N; i++) {
+      if (inputs[i].length > 0) anyQueueNonEmpty = true;
+
+      const result = executeInstructions(
+        programs,
+        relativeBases,
+        inputs,
+        indexes,
+        i,
+      );
+
+      if (Array.isArray(result)) {
+        const [dest, x, y] = result;
+        anyPacketActivity = true;
+
+        if (dest === 255) {
+          NAT.x = x;
+          NAT.y = y;
+        } else {
+          inputs[dest].push(x, y);
+        }
       }
-    } else isHalted[i] = output;
-    // console.log(i);
-    i = ++i % 50;
+    }
+
+    // ✅ CORRECT IDLE CHECK
+    if (!anyPacketActivity && !anyQueueNonEmpty && NAT.y !== null) {
+      inputs[0].push(NAT.x, NAT.y);
+
+      if (lastSentY === NAT.y) {
+        console.log("ANSWER:", NAT.y);
+        break;
+      }
+
+      lastSentY = NAT.y;
+    }
   }
 };
-
 main();
