@@ -11,12 +11,12 @@ const executeInstructions = (instructions, accumulator) => {
   const executedInsId = [];
   const currentIns = [0];
   while (
-    // !executedInsId.includes(currentIns[0]) &&
-    executedInsId.length < instructions.length
+    !executedInsId.includes(currentIns[0]) &&
+    currentIns[0] < instructions.length
   ) {
-    const [ins, arg] = instructions[currentIns].split(" ");
+    const [ins, arg] = instructions[currentIns[0]].split(" ");
     executedInsId.push(currentIns[0]);
-    console.log(ins, accumulator);
+    // console.log(ins, accumulator);
     runIns[ins](+arg);
     if (executedInsId.includes(currentIns[0])) {
       let correctIns = "";
@@ -33,12 +33,33 @@ const executeInstructions = (instructions, accumulator) => {
     }
   }
   console.log(accumulator);
+  return currentIns[0] >= instructions.length;
 };
 
 const main = () => {
-  const instructions = Deno.readTextFileSync("input.txt").split("\r\n");
+  const instructions = Deno.readTextFileSync("input.txt").split("\n");
+  const insList = {};
+  for (let i = 0; i < instructions.length; i++) {
+    const [ins, arg] = instructions[i].split(" ");
+    if (ins === "jmp" || ins === "nop") {
+      insList[i] = (ins === "jmp" ? "nop" : "jmp") + " " + arg;
+    }
+  }
   const accumulator = [0];
-  executeInstructions(instructions, accumulator);
+  let modifiedIns = [...instructions];
+  const keys = Object.keys(insList);
+  let i = 0;
+  let key = keys[i];
+  let isFullyCompleted = false;
+  while (!isFullyCompleted) {
+    accumulator[0] = 0;
+    modifiedIns[+key] = insList[key];
+    isFullyCompleted = executeInstructions(modifiedIns, accumulator);
+    i++;
+    key = keys[i];
+    modifiedIns = [...instructions];
+    console.log(isFullyCompleted);
+  }
 };
 
 main();
