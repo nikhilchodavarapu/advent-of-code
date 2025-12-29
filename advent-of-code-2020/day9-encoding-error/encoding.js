@@ -15,12 +15,23 @@ const isPair = (numbers, sum) => {
 
 const isSumEqualsToOrGreater = (numbers, sum) => {
   let i = 0;
-  let j = 0;
-  const sorted = numbers.toSorted((a, b) => a - b)
+  let j = 1;
+  let result = 0;
+  let addedNumbers = [];
   while (i < numbers.length) {
-
+    result += numbers[i];
+    addedNumbers.push(numbers[i]);
+    if (result === sum) return addedNumbers;
+    if (result > sum) {
+      i = j - 1;
+      j++;
+      addedNumbers = [];
+      result = 0;
+    }
+    i++;
   }
-}
+  return addedNumbers;
+};
 
 const main = () => {
   const input = Deno.readTextFileSync("input.txt").split("\n").map((x) => +x);
@@ -29,6 +40,9 @@ const main = () => {
     if (typeof isPair(input.slice(i - 25, i), input[i]) === "number") break;
   }
   console.log(input[i]);
+  const addedNumbers = isSumEqualsToOrGreater(input, input[i]);
+  console.log(addedNumbers);
+  console.log(Math.max(...addedNumbers) + Math.min(...addedNumbers));
 };
 
 main();

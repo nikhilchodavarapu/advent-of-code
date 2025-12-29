@@ -50,7 +50,11 @@ The final step in breaking the XMAS encryption relies on the invalid number you 
 Again consider the above example:
 
 35
-223
+20
+15
+25
+47
+40
 62
 55
 65
