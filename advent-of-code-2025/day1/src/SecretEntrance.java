@@ -4661,10 +4661,11 @@ public class SecretEntrance {
         L38
         L31
         L35
-        R43                            """;
+        R43
+                                                     """;
 
     Dail dail = new Dail();
-    int zeroCount = 0;
+
     for (String ins : input.split("\n")) {
       if (ins.trim().length() == 0) {
         continue;
@@ -4672,12 +4673,8 @@ public class SecretEntrance {
 
       Rotation rotation = Parser.parse(ins.trim());
       dail.rotate(rotation.direction(), rotation.distance());
-
-      if (dail.isPointingAtZero()) {
-        zeroCount++;
-      }
     }
 
-    System.out.println(zeroCount);
+    System.out.println(dail.getZeroHits());
   }
 }
