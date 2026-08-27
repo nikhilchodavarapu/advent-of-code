@@ -204,7 +204,7 @@ public class Lobby {
                 """;
 
         String[] banks = input.split("\n");
-        int totalJoltage = 0;
+        long totalJoltage = 0;
         for (String bank : banks) {
             if (bank.trim().isEmpty()) {
                 continue;
