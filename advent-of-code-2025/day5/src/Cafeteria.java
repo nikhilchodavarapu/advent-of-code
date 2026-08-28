@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Cafeteria {
@@ -1184,8 +1186,49 @@ public class Cafeteria {
 
         DataBase dataBase = Parser.parse(input);
 
-        int freshIngredientsCount = freshIngredients(dataBase);
-        System.out.println(freshIngredientsCount);
+//        int freshIngredientsCount = freshIngredients(dataBase);
+//        System.out.println(freshIngredientsCount);
+
+        Long ingredientsConsideredToBeFresh = considerableFreshIngredients(dataBase.ranges());
+        System.out.println(ingredientsConsideredToBeFresh);
+    }
+
+    private static Long considerableFreshIngredients(List<Range> ranges) {
+        ranges.sort(Comparator.comparingLong(Range::min));
+
+        int i = 0;
+        while (i < ranges.size() - 1) {
+            Range range1 = ranges.get(i);
+            Range range2 = ranges.get(i + 1);
+
+            if (canMerge(range1, range2)) {
+                Long min = range1.min();
+                Long max = range1.max() > range2.max() ? range1.max() : range2.max();
+
+                ranges.remove(i + 1);
+                ranges.remove(i);
+                ranges.add(i, new Range(min, max));
+            } else {
+                i++;
+            }
+
+        }
+
+        return totalConsiderableFreshIngredients(ranges);
+    }
+
+    private static Long totalConsiderableFreshIngredients(List<Range> ranges) {
+        long ingredientsConsideredToBeFresh = 0L;
+
+        for (Range range : ranges) {
+            ingredientsConsideredToBeFresh += range.max() - range.min() + 1;
+        }
+
+        return ingredientsConsideredToBeFresh;
+    }
+
+    private static boolean canMerge(Range range1, Range range2) {
+        return range1.max() >= range2.min();
     }
 
     private static int freshIngredients(DataBase dataBase) {
