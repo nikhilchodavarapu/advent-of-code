@@ -145,36 +145,42 @@ public class Laboratories {
 .............................................................................................................................................
 .^.^.^.^.^.^.^.^.^.^.^...^...^.^...^.^.^.^.^.^.....^...^.^.^...^.^.^...^.^.^.^.^...^.^.^.^.^.^.^.^...^.^.^...^...^.^.^...^.^.....^.^.^.^.^.^.
 .............................................................................................................................................""";
-
         String[][] tachyonManifolds = Arrays.stream(input.split("\n")).map(x -> x.split("")).toArray(String[][]::new);
 
         Beam beam = getBeamLoc(tachyonManifolds);
         firstMove(tachyonManifolds, beam);
-        int splitCount = moveBeam(tachyonManifolds);
-        System.out.println(splitCount);
+        long timelines = moveBeam(tachyonManifolds);
+        System.out.println(timelines);
     }
 
-    private static int moveBeam(String[][] tachyonManifolds) {
-        int splitCount = 0;
+    private static Long moveBeam(String[][] tachyonManifolds) {
 
         for (int i = 2; i < tachyonManifolds.length; i++) {
 
             for (int j = 0; j < tachyonManifolds[i].length; j++) {
 
-                if (isASplitter(tachyonManifolds[i][j]) && isBeanOnTop(tachyonManifolds[i - 1][j])) {
-                    tachyonManifolds[i][j - 1] = "|";
-                    tachyonManifolds[i][j + 1] = "|";
-                    splitCount++;
+                if (isASplitter(tachyonManifolds[i][j]) && isBean(tachyonManifolds[i - 1][j])) {
+                    tachyonManifolds[i][j - 1] = isBean(tachyonManifolds[i][j - 1]) ? Long.parseLong(tachyonManifolds[i][j - 1]) + Long.parseLong(tachyonManifolds[i - 1][j]) + "" : tachyonManifolds[i - 1][j];
+                    tachyonManifolds[i][j + 1] = isBean(tachyonManifolds[i][j + 1]) ? Long.parseLong(tachyonManifolds[i][j + 1]) + Long.parseLong(tachyonManifolds[i - 1][j]) + "" : tachyonManifolds[i - 1][j];
                 }
 
-                if (!isASplitter(tachyonManifolds[i][j]) && isBeanOnTop(tachyonManifolds[i - 1][j])) {
-                    tachyonManifolds[i][j] = "|";
+                if (!isASplitter(tachyonManifolds[i][j]) && isBean(tachyonManifolds[i - 1][j])) {
+                    tachyonManifolds[i][j] = isBean(tachyonManifolds[i][j])
+                            ? Long.parseLong(tachyonManifolds[i][j]) + Long.parseLong(tachyonManifolds[i - 1][j]) + ""
+                            : tachyonManifolds[i - 1][j];
                 }
 
             }
         }
 
-        return splitCount;
+        long sum = 0L;
+        for (int i = 0; i < tachyonManifolds[0].length; i++) {
+            String s = tachyonManifolds[tachyonManifolds.length - 1][i];
+            if (isBean(s)) {
+                sum += Long.parseLong(s);
+            }
+        }
+        return sum;
     }
 
     private static void displayManifold(String[][] tachyonManifolds) {
@@ -183,8 +189,13 @@ public class Laboratories {
         }
     }
 
-    private static boolean isBeanOnTop(String s) {
-        return s.equals("|");
+    private static boolean isBean(String s) {
+        try {
+            Long.parseLong(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     private static boolean isASplitter(String s) {
@@ -192,7 +203,7 @@ public class Laboratories {
     }
 
     private static void firstMove(String[][] tachyonManifolds, Beam beam) {
-        tachyonManifolds[beam.y() + 1][beam.x()] = "|";
+        tachyonManifolds[beam.y() + 1][beam.x()] = "1";
     }
 
     private static Beam getBeamLoc(String[][] tachyonManifolds) {
@@ -205,4 +216,6 @@ public class Laboratories {
 
         return new Beam(0, 0);
     }
+
+
 }
